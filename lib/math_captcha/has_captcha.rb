@@ -1,7 +1,7 @@
 module MathCaptcha
   module HasCaptcha
     def validate_on_create
-      self.errors.add(:captcha_solution, "wrong answer.") unless self.captcha.check(self.captcha_solution)
+      self.errors.add(:captcha_solution, "wrong answer.") unless self.captcha.check(self.captcha_solution.to_i)
     end
     
     module ClassMethods
