@@ -16,8 +16,6 @@ class Captcha
     "#{@x} #{@operator.to_s} #{@y}"
   end
 
-private
-
   def solution
     @x.send @operator, @y
   end
