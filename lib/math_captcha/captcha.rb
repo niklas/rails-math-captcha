@@ -19,4 +19,21 @@ class Captcha
   def solution
     @x.send @operator, @y
   end
+
+  def to_secret
+    to_yaml.crypt
+  end
+
+  def to_yaml
+    {
+      :x => x,
+      :y => y,
+      :operator => operator
+    }.to_yaml
+  end
+
+  def self.from_secret(secret)
+    args = YAML.parse(secret.decrypt)
+    new(args[:x], args[:y], args[:operator])
+  end
 end
