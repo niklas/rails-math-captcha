@@ -1,10 +1,8 @@
 module MathCaptcha
   module HasCaptcha
     module InstanceMethods
-      def validate_captcha
-        unless skip_captcha?
-          self.errors.add(:captcha_solution, "wrong answer.") unless self.captcha.check(self.captcha_solution.to_i)
-        end
+      def must_solve_captcha
+        self.errors.add(:captcha_solution, "wrong answer.") unless self.captcha.check(self.captcha_solution.to_i)
       end
       def skip_captcha!
         self.class.skip_captcha!
@@ -30,6 +28,8 @@ module MathCaptcha
         dont_skip_captcha!
         validates_presence_of :captcha_solution, 
           :on => :create, :message => "can't be blank", 
+          :unless => Proc.new {|record| record.skip_captcha? }
+        validate_on_create :must_solve_captcha,
           :unless => Proc.new {|record| record.skip_captcha? }
       end
       def skip_captcha!
