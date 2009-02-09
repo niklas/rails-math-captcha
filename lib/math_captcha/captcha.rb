@@ -1,9 +1,8 @@
-require 'openssl'
-require 'yaml'
+require 'rubygems'
+require 'ezcrypto'
 class Captcha
   NUMBERS   = (1..9).to_a
   OPERATORS = [:+, :-, :*]
-  CryptoName = 'AES-128-CBC'
 
   attr_reader :x, :y, :operator
 
@@ -16,19 +15,13 @@ class Captcha
   # Only the #to_secret is shared with the client.
   # It can be reused here to create the Captcha again
   def self.from_secret(secret)
-    reset_crypto
-    crypto.decrypt(key)
-    yml = crypto.update(secret)
-    yml << crypto.final
+    yml = cipher.decrypt64 secret
     args = YAML.load(yml)
     new(args[:x], args[:y], args[:operator])
   end
 
-  def self.crypto
-    @@crypto ||= OpenSSL::Cipher::Cipher.new(CryptoName)
-  end
-  def self.reset_crypto
-    @@crypto = nil
+  def self.cipher
+    EzCrypto::Key.with_password key, 'bad_fixed_salt'
   end
 
   def self.key
@@ -50,11 +43,7 @@ class Captcha
   end
 
   def to_secret
-    reset_crypto
-    crypto.encrypt(self.class.key)
-    cipher = crypto.update(to_yaml)
-    cipher << crypto.final
-    cipher
+    cipher.encrypt64(to_yaml)
   end
 
   def to_yaml
@@ -66,11 +55,11 @@ class Captcha
   end
 
   private
-  def crypto
-    self.class.crypto
+  def cipher
+    @cipher ||= self.class.cipher
   end
-  def reset_crypto
-    self.class.reset_crypto
+  def reset_cipher
+    @cipher = nil
   end
 
 end

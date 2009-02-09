@@ -1,5 +1,5 @@
 require 'lib/math_captcha/captcha'
-
+require 'base64'
 
 describe Captcha do
   describe "with a random task" do
@@ -21,6 +21,14 @@ describe Captcha do
     it "should have a secret to use in forms" do
       @captcha.to_secret.should_not be_nil
       @captcha.to_secret.should_not be_empty
+    end
+
+    it "should re-use its cipher" do
+      @captcha.send(:cipher).should == @captcha.send(:cipher)
+    end
+
+    it "should have a base64 encoded secret" do
+      lambda { Base64.decode64(@captcha.to_secret).should_not be_nil }.should_not raise_error
     end
 
     describe "re-creating another from secret" do
