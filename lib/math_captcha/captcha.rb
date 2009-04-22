@@ -36,6 +36,9 @@ class Captcha
   def task
     "#{@x} #{@operator.to_s} #{@y}"
   end
+  def task_with_questionmark
+    "#{@x} #{@operator.to_s} #{@y} = ?"
+  end
   alias_method :to_s, :task
 
   def solution
