@@ -41,6 +41,12 @@ module MathCaptcha
       def skip_captcha?
         @@skip_captcha
       end
+      def skipping_captcha(&block)
+        skipping_before = skip_captcha?
+        skip_captcha!
+        yield
+        dont_skip_captcha! if skipping_before
+      end
     end
   end
 end
